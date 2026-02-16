@@ -1,0 +1,39 @@
+# macOS specific files
+.DS_Store
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS folder attributes
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Rust specific files
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.un~
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+
+# Byebug
+.byebug_history
+
+# Other backups
+*.bak
+*.tmp
+*.old
+*.orig
+*.rej
