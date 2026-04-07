@@ -1,1 +1,1 @@
-/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/wasabi.efi: /home/ishmael/mydev/hikalium_OS1/wasabi/src/main.rs
+/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/wasabi.efi: /home/ishmael/mydev/hikalium_OS1/wasabi/src/font.txt /home/ishmael/mydev/hikalium_OS1/wasabi/src/main.rs
