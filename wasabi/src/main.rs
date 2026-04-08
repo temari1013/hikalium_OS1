@@ -41,12 +41,32 @@ enum EfiStatus {
 
 #[repr(C)]
 struct EfiBootServicesTable {
-    _reserved0: [u64; 40],
+    _reserved0: [u64; 7],
+    get_memory_map: extern "win64" fn(
+        memory_map_size: *mut usize,
+        memory_map: *mut u8,
+        map_key: *mut usize,
+        descriptor_size: *mut usize,
+        descriptor_version: *mut u32,
+    ) -> EfiStatus,
+    _reserved1: [u64,32],
+
     locate_protocol: extern "win64" fn(
         protocol: *const EfiGuid,
         registration: *const EfiVoid,
         interface: *mut *mut EfiVoid,
     ) -> EfiStatus,
+}
+impl EfiBootServicesTable {
+    fn get_memory_map(&self, map: &mut MemorymapHolder) -> EfiStatus{
+        (self.get_memory_map){
+            &mut map.memory_map_size ,
+            map.memory_map_buffer.as_mut_ptr(),
+            &mut map.map_key,
+            &mut map.descriptor_size,
+            &mut map.descriptor_version,
+        }
+    }
 }
 const _: () = assert!(offset_of!(EfiBootServicesTable, locate_protocol) == 320);
 
@@ -370,4 +390,35 @@ impl fmt::Write for VramTextWriter<'_>{
         }
         Ok(())
     }
+}
+
+#[repr(C)]
+#[derive(Clone,Copy, PartialEq, Eq, Debug)]
+struct EfiMemoryDescriptor {
+    memory_tipe: EfiMemoryType,
+    physical_start: u64,
+    virtual_start, u64,
+    number_of_pages: u64,
+    attribute: u64,
+}
+
+#[repr(i64)]
+#[derive(Debug, Clone ,Copy, PartialEq,Eq)]
+#[allow(non_camel_case_types)]
+pub enum EfimemoryType {
+    RESERVED = 0;
+    LOADER_CODE,
+    LOADER_DATA,
+    BOOT_SERVICES_CODE,
+    BOOT_SERVICES_DATA,
+    RUNTIME_SERVICES_CODE,
+    RUNTIME_SERVICES_DATA,
+    CONVENTIONAL_MEMORY,
+    UNUSABLE_MEMORY,
+    ACPI_RECLAIM_MEMORY,
+    ACPI_MEMORY_NVS,
+    MEMORY_MAPPED_IO,
+    MEMORY_MAPPED_IOPORT_SPACE,
+    PAL_CODE,
+    PERSISTENT_MEMORY,
 }
