@@ -17,9 +17,7 @@ use wasabi::uefi::EfiSystemTable;
 use wasabi::uefi::MemoryMapHolder;
 use wasabi::uefi::VramTextWriter;
 
-pub fn hlt() {
-    unsafe { asm!("hlt") };
-}
+use wasabi::x86::hlt;
 
 #[no_mangle]
 fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
@@ -64,8 +62,19 @@ writeln!(w, "hello,Non-UEFI world!").unwrap();
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {
-        hlt()
+    exit_qemu(QemuExitCode::Fail);
+}
+
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+#[repr(u32)]
+pub enum QemuExitCode {
+    Success = 0x1,
+    Fail = 0x2,
+}
+pub fn exit_qemu(Exit_code: QemuExitCode) -> !{
+    write_io_port_u8(0xf4,exit_code as u8);
+    loop{
+        hlt();
     }
 }
 
