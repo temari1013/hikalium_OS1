@@ -1,0 +1,17 @@
+   0.556700698s  INFO cargo::core::compiler::fingerprint: stale: changed "/home/ishmael/mydev/hikalium_OS1/wasabi/src/allocator.rs"
+   0.556726232s  INFO cargo::core::compiler::fingerprint:           (vs) "/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/.fingerprint/wasabi-688cb973d78eff02/dep-lib-wasabi"
+   0.556734554s  INFO cargo::core::compiler::fingerprint:                FileTime { seconds: 1776591000, nanos: 121564901 } < FileTime { seconds: 1776591249, nanos: 392807326 }
+   0.556839161s  INFO cargo::core::compiler::fingerprint: fingerprint dirty for wasabi v0.1.0 (/home/ishmael/mydev/hikalium_OS1/wasabi)/Check { test: false }/TargetInner { ..: lib_target("wasabi", ["lib"], "/home/ishmael/mydev/hikalium_OS1/wasabi/src/lib.rs", Edition2021) }
+   0.556863676s  INFO cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/.fingerprint/wasabi-688cb973d78eff02/dep-lib-wasabi", reference_mtime: FileTime { seconds: 1776591000, nanos: 121564901 }, stale: "/home/ishmael/mydev/hikalium_OS1/wasabi/src/allocator.rs", stale_mtime: FileTime { seconds: 1776591249, nanos: 392807326 } }))
+   0.560523145s  INFO cargo::core::compiler::fingerprint: stale: changed "/home/ishmael/mydev/hikalium_OS1/wasabi/src/allocator.rs"
+   0.560538560s  INFO cargo::core::compiler::fingerprint:           (vs) "/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/.fingerprint/wasabi-1f03e8913b7bd18e/dep-test-lib-wasabi"
+   0.560554898s  INFO cargo::core::compiler::fingerprint:                FileTime { seconds: 1776591000, nanos: 124564879 } < FileTime { seconds: 1776591249, nanos: 392807326 }
+   0.560634601s  INFO cargo::core::compiler::fingerprint: fingerprint dirty for wasabi v0.1.0 (/home/ishmael/mydev/hikalium_OS1/wasabi)/Check { test: true }/TargetInner { ..: lib_target("wasabi", ["lib"], "/home/ishmael/mydev/hikalium_OS1/wasabi/src/lib.rs", Edition2021) }
+   0.560653558s  INFO cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/ishmael/mydev/hikalium_OS1/wasabi/target/x86_64-unknown-uefi/debug/.fingerprint/wasabi-1f03e8913b7bd18e/dep-test-lib-wasabi", reference_mtime: FileTime { seconds: 1776591000, nanos: 124564879 }, stale: "/home/ishmael/mydev/hikalium_OS1/wasabi/src/allocator.rs", stale_mtime: FileTime { seconds: 1776591249, nanos: 392807326 } }))
+   0.560914056s  INFO cargo::core::compiler::fingerprint: fingerprint dirty for wasabi v0.1.0 (/home/ishmael/mydev/hikalium_OS1/wasabi)/Check { test: false }/TargetInner { name: "wasabi", tested: false, doc: true, ..: with_path("/home/ishmael/mydev/hikalium_OS1/wasabi/src/main.rs", Edition2021) }
+   0.560929219s  INFO cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "wasabi" })
+   0.580246856s  INFO cargo::core::compiler::fingerprint: fingerprint dirty for wasabi v0.1.0 (/home/ishmael/mydev/hikalium_OS1/wasabi)/Check { test: true }/TargetInner { name: "wasabi", tested: false, doc: true, ..: with_path("/home/ishmael/mydev/hikalium_OS1/wasabi/src/main.rs", Edition2021) }
+   0.580310072s  INFO cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+    Checking wasabi v0.1.0 (/home/ishmael/mydev/hikalium_OS1/wasabi)
+error: could not compile `wasabi` (bin "wasabi" test) due to 133 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...

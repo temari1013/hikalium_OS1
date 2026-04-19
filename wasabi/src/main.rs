@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(offset_of)]
 
-use core::arch::asm;
+
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
@@ -16,6 +16,7 @@ use wasabi::uefi::EfiMemoryType;
 use wasabi::uefi::EfiSystemTable;
 use wasabi::uefi::MemoryMapHolder;
 use wasabi::uefi::VramTextWriter;
+use wasabi::x86::write_io_port_u8;
 
 use wasabi::x86::hlt;
 
@@ -72,7 +73,7 @@ pub enum QemuExitCode {
     Fail = 0x2,
 }
 pub fn exit_qemu(Exit_code: QemuExitCode) -> !{
-    write_io_port_u8(0xf4,exit_code as u8);
+    write_io_port_u8(0xf4,Exit_code as u8);
     loop{
         hlt();
     }
