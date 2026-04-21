@@ -1,7 +1,6 @@
 use crate::result::Result;
 use core::cmp::min;
 
-
 pub trait Bitmap {
     fn bytes_per_pixel(&self) -> i64;
     fn pixels_per_line(&self) -> i64;
@@ -32,7 +31,6 @@ pub trait Bitmap {
     }
 }
 
-
 unsafe fn unchecked_draw_point<T: Bitmap>(buf: &mut T, color: u32, x: i64, y: i64) {
     *buf.unchecked_pixel_at_mut(x, y) = color;
 }
@@ -42,7 +40,14 @@ fn draw_point<T: Bitmap>(buf: &mut T, color: u32, x: i64, y: i64) -> Result<()> 
     Ok(())
 }
 
-pub fn fill_rect<T: Bitmap>(buf: &mut T, color: u32, px: i64, py: i64, w: i64, h: i64) -> Result<()> {
+pub fn fill_rect<T: Bitmap>(
+    buf: &mut T,
+    color: u32,
+    px: i64,
+    py: i64,
+    w: i64,
+    h: i64,
+) -> Result<()> {
     if !buf.is_in_x_range(px)
         || !buf.is_in_y_range(py)
         || !buf.is_in_x_range(px + w - 1)
@@ -138,30 +143,28 @@ fn lookup_font(c: char) -> Option<[[char; 8]; 16]> {
     None
 }
 
-pub fn draw_str_fg<T:Bitmap>(buf: &mut T, x:i64, y:i64, color:u32, s:&str) {
-    for(i,c) in s.chars().enumerate(){
-        draw_font_fg(buf,x + i as i64 * 8, y,color,c)
+pub fn draw_str_fg<T: Bitmap>(buf: &mut T, x: i64, y: i64, color: u32, s: &str) {
+    for (i, c) in s.chars().enumerate() {
+        draw_font_fg(buf, x + i as i64 * 8, y, color, c)
     }
 }
 
 pub fn draw_test_pattern<T: Bitmap>(buf: &mut T) {
     let w = 128;
-    let left = buf.width() - w-1;
-    let colors = [0x000000,0xff0000,0x00ff00,0x0000ff];
+    let left = buf.width() - w - 1;
+    let colors = [0x000000, 0xff0000, 0x00ff00, 0x0000ff];
     let h = 64;
-    for(i,c) in colors.iter().enumerate() {
+    for (i, c) in colors.iter().enumerate() {
         let y = i as i64 * h;
         fill_rect(buf, *c, left, y, h, h).expect("fill_rect failed");
-        fill_rect(buf, !*c, left + h, y,h,h).expect("fill_rect failed");
+        fill_rect(buf, !*c, left + h, y, h, h).expect("fill_rect failed");
     }
-    let points = [(0,0),(0,w),(w,0),(w,w)];
-    for (x0,y0) in points.iter() {
-        for(x1,y1) in points.iter() {
-            let _ = draw_line(buf,0xffffff,left + *x0, *y0 , left + *x1, *y1);
+    let points = [(0, 0), (0, w), (w, 0), (w, w)];
+    for (x0, y0) in points.iter() {
+        for (x1, y1) in points.iter() {
+            let _ = draw_line(buf, 0xffffff, left + *x0, *y0, left + *x1, *y1);
         }
     }
-    draw_str_fg(buf, left,h*colors.len() as i64, 0x00ff00,"0123456789");
-     draw_str_fg(buf, left,h*colors.len() as i64 + 16, 0x00ff00,"ABCDEF");
-    
+    draw_str_fg(buf, left, h * colors.len() as i64, 0x00ff00, "0123456789");
+    draw_str_fg(buf, left, h * colors.len() as i64 + 16, 0x00ff00, "ABCDEF");
 }
-

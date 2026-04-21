@@ -1,7 +1,7 @@
 use crate::x86::hlt;
 use crate::x86::write_io_port_u8;
 
-#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum QemuExitCode {
     Success = 0x1,
@@ -13,4 +13,3 @@ pub fn exit_qemu(exit_code: QemuExitCode) -> ! {
         hlt()
     }
 }
-
