@@ -101,7 +101,7 @@ impl Header {
                 header_for_padding.is_allocated = false;
                 header_for_padding.size = self.end_addr() - header_for_allocated.end_addr();
                 size_used += header_for_padding.size;
-                header_for_allocated.next_header = header_for_allocated.next_header.take();
+                header_for_padding.next_header = header_for_allocated.next_header.take();
                 header_for_allocated.next_header =   Some(header_for_padding);
             }
             assert!(self.size >= size_used + HEADER_SIZE);
