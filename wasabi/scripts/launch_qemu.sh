@@ -19,7 +19,7 @@ RETCODE=$?
 set -e
 if [ $RETCODE -eq 0 ]; then
     exit 0
-elif [ $RETCODE -eq 3]; then
+elif [ $RETCODE -eq 3 ]; then
     printf "\nPASS\n"
 else 
     printf "\nFAIL: QEMU returned $RETCODE\n"
