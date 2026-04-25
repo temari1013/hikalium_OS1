@@ -12,6 +12,7 @@ pub mod result;
 pub mod serial;
 pub mod uefi;
 pub mod x86;
+pub mod print;
 pub mod init;
 
 #[cfg(test)]
