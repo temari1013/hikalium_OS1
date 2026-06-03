@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(offset_of)]
 
+use wasabi::uefi::VramTextWriter;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
@@ -25,6 +26,8 @@ use wasabi::uefi::MemoryMapHolder;
 use wasabi::uefi::VramTextWriter;
 use wasabi::warn;
 use wasabi::x86::hlt;
+use wasabi::x86::init_exceptions;
+use wasabi::x86::trigger_debug_interrupt;
 
 #[no_mangle]
 fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
@@ -72,6 +75,9 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let t = t.and_then(|t| t.next_level(0));
       println!("{t:?}");
 
+    let (_gdt, _idt) = init_exceptions();
+    info!("Exception initialized!");
+    trigger_debug_interrupt();
     hexdump(unsafe {&*cr3});
     loop {
         hlt()

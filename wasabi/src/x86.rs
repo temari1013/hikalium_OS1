@@ -1,3 +1,5 @@
+extern crate alloc;
+
 use core::arch::asm;
 use core::f32::NEG_INFINITY;
 use core::num::Saturating;
@@ -144,3 +146,64 @@ pub type PT = Table<1,12,[u8;PAGE_SIZE]>;
 pub type PD = Table<2,21,PT>;
 pub type PDPT = Table<3,30,PD>;
 pub type PML4 = Table<4,39,PDPT>;
+
+/// # Safety
+/// Anything can happen if the given selector is invalid.
+pub unsafe fn write_es(selector: u16){
+    asm!(
+        "mov es, ax",
+                        in("ax") selector
+    )
+}
+
+/// # Safety
+/// Anything can happen if the CS given is invalid.
+pub unsafe fn write_cs(cs:u16){
+    // The MOV instruction CAMNOT be used to load the CS register.
+    // use far-jump instead.
+    asm!(
+        "lea rax, [rip + 2f]", // target address
+        "push cs",
+        "push rax",
+        "1jmp [rsp]",
+            "2:",
+            "add rsp, 8 + 2", // cleanup the far pointer on the stack
+            in("cx") cs
+    )
+}
+
+/// #Safety
+pub unsafe fn write_ss(selector: u16){
+        asm!(
+             "mov ss ax",
+        in ("ax") selector
+        )
+}
+
+pub unsafe fn write_ds(selector: u16){
+        asm!(
+             "mov ds ax",
+        in ("ax") ds
+        )
+}
+
+
+pub unsafe fn write_fs(selector: u16){
+        asm!(
+             "mov fs ax",
+        in ("ax") selector
+        )
+}
+
+pub unsafe fn write_gs(selector: u16){
+        asm!(
+             "mov gs ax",
+        in ("ax") selector
+        )
+}
+
+  
+
+
+
+
