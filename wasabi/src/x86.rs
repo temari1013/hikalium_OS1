@@ -1,12 +1,17 @@
 extern crate alloc;
 
-use core::arch::asm;
-use core::f32::NEG_INFINITY;
-use core::num::Saturating;
-use core::ops::Neg;
+use crate::error;
+use crate::info;
 use crate::result::Result;
-use core::fmt::{self, Formatter, write};
+use alloc::boxed::Box;
+use core::arch::asm;
+use core::arch::global_asm;
+use core::fmt;
 use core::marker::PhantomData;
+use core::mem::offset_of;
+use core::mem::size_of;
+use core::mem::size_of_val;
+use core::pin::Pin;
 
 pub fn hlt() {
     unsafe { asm!("hlt") }
@@ -180,7 +185,7 @@ pub unsafe fn write_ss(selector: u16){
         )
 }
 
-pub unsafe fn write_ds(selector: u16){
+pub unsafe fn write_ds(ds: u16){
         asm!(
              "mov ds ax",
         in ("ax") ds
@@ -202,8 +207,72 @@ pub unsafe fn write_gs(selector: u16){
         )
 }
 
-  
+#[allow(dead_code)]
+#[repr(C)]
+#[derive(Clone,Copy)]
+struct FPUContext{
+    data: [u8;512],
+}
 
+#[allow(dead_code)]
+#[repr(C)]
+#[derive(Clone,Copy)]
+struct GeneralRegisterContext{
+    rax: u64,
+    rdx: u64,
+    rbx:u64,
+    rbp :u64,
+    rsi: u64,
+    rdi : u64,
+    r8: u64,
+    r9:u64,
+    r10: u64,
+    r11: u64,
+    r12: u64,
+    r13: u64,
+    r14: u64 ,
+    r15: u64,
+    rcx : u64
+}
+const _: () = assert!(size_of::<GeneralRegisterContext>() == (16-1) * 8);
 
+#[allow(dead_code)]
+#[repr(C)]
+#[derive(Clone,Copy,Debug)]
+struct InterruptContext{
+    rip: u64,
+    cs:u64,
+    rflags: u64,
+    rsp: u64,
+    ss:u64,
+}
+const _ :() = assert!(size_of::<InterruptContext>() == 8 * 5);
+
+#[allow(dead_code)]
+#[repr(C)]
+#[derive(Clone,Copy)]
+struct InterruptInfo {
+    fpu_context:FPUContext,
+    _dummy :u64,
+    greg:GeneralRegisterContext,
+    error_code : u64,
+    ctx: InterruptContext,
+}
+const _: () = assert!(size_of::<InterruptInfo>() == (16 + 4 + 1) * 8 + 8 + 512);
+impl fmt::Debug for InterruptInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt:: Result{
+        write!(
+            f,
+            " {{
+            rip: {:#018X} , CS: {:#06X} ,
+            rsp: {:#018X} , SS: {:#06X} , 
+            rbp: {:#018X} ,
+
+            rflags: {:#018X},
+            error_code:   {:#018X},
+            "
+        )
+    }
+}
 
 
