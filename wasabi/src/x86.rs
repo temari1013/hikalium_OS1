@@ -269,10 +269,231 @@ impl fmt::Debug for InterruptInfo {
             rbp: {:#018X} ,
 
             rflags: {:#018X},
-            error_code:   {:#018X},
-            "
+            error_code:   {:#018X}, 
+
+             rax: {:#018X} , rcx: {:#018X} , 
+              rdx: {:#018X} , rbx: {:#018X} , 
+               rsi: {:#018X} , rdi: {:#018X} , 
+                r8: {:#018X} , r9: {:#018X} , 
+                 r10: {:#018X} , r11: {:#018X} , 
+                  r12: {:#018X} , r13: {:#018X} , 
+                   r14: {:#018X} , r15: {:#018X} ,
+        }}
+            ",
+            self.ctx.rip,
+            self.ctx.cs,
+            self.ctx.rsp,
+            self.ctx.ss,
+            self.greg.rbp,
+            self.ctx.rflags,
+            self.error_code,
+            //
+            self.greg.rax,
+            self.greg.rcx,
+            self.greg.rdx,
+            self.greg.rbx,
+            //
+            self.greg.rsi,
+            self.greg .rdi,
+            //
+            
+            self.greg.r8,
+            self.greg.r9,
+            self.greg.r10,
+            self.greg.r11,
+            self.greg.r12,
+            self.greg.r13,
+            self.greg.r14,
+            self.greg.r15,
+
         )
     }
 }
 
+// SDM Vol.3: 6.14.2 64-bit Mode Stack Frame
 
+macro_rules! interrupt_entrypoint {
+    ($index:literal) => {
+        global_asm!(concat!(
+            ".global intterupt entrypoint" ,
+            stringify!($index),
+            "\n",
+            "interrupt_entrypoint",
+            stringify!($index),
+            ":\n",
+            "push 0 // No error code\n",
+            "push rcx // Save rcx first to reuse\n",
+            "mov rcx,",
+            stringify!($index),
+            "\n",
+            "jmp ithandler_common"
+        ));
+    };
+}
+
+
+macro_rules! interrupt_entrypoint_with_ecode {
+    ($index:literal) => {
+        global_asm!(concat!(
+            ".global intterupt entrypoint" ,
+            stringify!($index),
+            "\n",
+            "interrupt_entrypoint",
+            stringify!($index),
+            ":\n",
+            "push rcx // Save rcx first to reuse\n",
+            "mov rcx,",
+            stringify!($index),
+            "\n",
+            "jmp ithandler_common"
+        ));
+    };
+}
+
+
+interrupt_entrypoint!(3);
+interrupt_entrypoint!(6);
+interrupt_entrypoint_with_ecode!(8);
+interrupt_entrypoint_with_ecode!(13);
+interrupt_entrypoint_with_ecode!(14);
+interrupt_entrypoint!(32);
+
+extern "sysv64" {
+    fn interrupt_entrypoint3();
+    fn interrupt_entrypoint6();
+    fn interrupt_entrypoint8();
+    fn interrupt_entrypoint13();
+    fn interrupt_entrypoint14();
+    fn interrupt_entrypoint32();
+
+}
+
+global_asm!(
+    r#"
+    .global intandler_common
+    inthandler_common:
+    // General purpose registers (except rsp and rcx)
+    push r15
+    push r14
+    push r13
+    push r12
+    push r11
+    push r10
+    push r9
+    push r8
+    psh rdi 
+    push rsi
+    push rbp
+    push rbx
+    push rdx
+    push rax
+    // FPU Staete
+    sub rsp, 512 + 8
+    fxave64[rsp]
+    // 1st parameter : pointer to the saved CPU State
+    mov rdi rsp
+    // Align the stack to 16^bytes boundary
+    moc rbp rsp
+    and rsp -16
+    // 2nd parameter: Int#
+    mov rsi , rcx
+
+    call inthandler
+
+    mov rsp,rbp
+    // fxrstor64[rsp]
+    add rsp 512 + 8
+
+    // 
+    pop rax
+    pop rdx
+    pop rbp 
+    pop rsi
+    pop rdi
+    pop r8
+    pop r9
+    pop r10
+    pop r11
+    pop r12
+    pop r12
+    pop r13
+    pop r14
+    pop r15
+    //
+    pop rcx
+    add rsp , 8 //for Error Code
+    iretq
+"#
+);
+
+pub fn read_cr2() -> u64{
+    let mut cr2: u64;
+    unsafe {
+        asm!("mov rax,cr2",
+    out("rax") cr2)
+    }
+    cr2
+}
+
+#[no_mangle]
+extern "sysv64" fn inthandler(info: &InterruptInfo, index: usize){
+    error!("Interrupt Info : {:?}" , info);
+    error!("Exception {index:#04X}:");
+    match index {
+        3 => {
+            error!("Breakpoint");
+        }
+        6 => {
+            error!("Invalid Opcode");
+        }
+        8 => {
+            error!("Double Fault");
+        }
+        13 => {
+            error!("GEneral Protection Fault");
+            let rip = info.ctx.rip;
+            error!("Bytes@ RIP {{rip:#018X}}:");
+            let rip = rip as *const u8;
+            let bytes = unsafe {core::slice::from_raw_parts(rip, 16)};
+            error!(" = {bytes:02X?}");
+        }
+        14 => {
+            error!("Page Fault");
+            error!("CR = {:#018X}", read_cr2());
+            error!(
+            "Caused by: {} A {} mode on a {} page , pge structures are {}",
+            if info.error_code & 0b0000_0100 != 0{
+                "user"
+            }else {
+                "supervisor"
+            },
+            if info.error_code & 0b0001_0000 != 0 {
+                "instruction fetch"
+            }else if info.error_code & 0b0010 != 0 {
+                "data write"
+            }else {
+                "data read"
+            },
+            if info.error_code &0b0001 != 0 {
+                "present"
+            }else {
+                "non_present"
+            },
+            if info.error_code & 0b1000 != 0{
+                "Invalid"
+            }else {
+                "valid"
+            },
+            );
+        }
+       _ => {
+        error!("Not handeled");
+       }
+    }
+     panic!("fatal exception");
+}
+
+#[no_mangle]
+extern "sysv64" fn int_handler_unimplemented() {
+    panic!("unexpected interrupt!");
+}
