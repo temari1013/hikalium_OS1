@@ -45,7 +45,7 @@ fn hexdump_bytes(bytes: &[u8]) {
         ascii[i] = *v;
 
         i += 1;
-        
+
         if i == 16 {
             print!("|");
             for c in ascii.iter() {
@@ -67,18 +67,18 @@ fn hexdump_bytes(bytes: &[u8]) {
         }
     }
 
-    if i!=0 {
+    if i != 0 {
         let old_i = i;
-        while i<16 {
+        while i < 16 {
             print!("    ");
             i += 1;
         }
         for c in ascii[0..old_i].iter() {
             print!(
                 "{}",
-                if (0x20u8..=0x7fu8).contains(c){
+                if (0x20u8..=0x7fu8).contains(c) {
                     *c as char
-                }else {
+                } else {
                     '.'
                 }
             );
@@ -87,8 +87,10 @@ fn hexdump_bytes(bytes: &[u8]) {
     }
 }
 
-pub fn hexdump<T: Sized>(data:&T) {
-    hexdump_bytes(unsafe {{
-        slice::from_raw_parts(data as *const T as *const u8, size_of::<T>())
-    }})
+pub fn hexdump<T: Sized>(data: &T) {
+    hexdump_bytes(unsafe {
+        {
+            slice::from_raw_parts(data as *const T as *const u8, size_of::<T>())
+        }
+    })
 }

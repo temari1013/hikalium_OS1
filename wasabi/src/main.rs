@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(offset_of)]
 
-use wasabi::uefi::VramTextWriter;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
@@ -23,6 +22,7 @@ use wasabi::uefi::EfiHandle;
 use wasabi::uefi::EfiMemoryType;
 use wasabi::uefi::EfiSystemTable;
 use wasabi::uefi::MemoryMapHolder;
+use wasabi::uefi::VramTextWriter;
 use wasabi::uefi::VramTextWriter;
 use wasabi::warn;
 use wasabi::x86::hlt;
@@ -66,19 +66,19 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let cr3 = wasabi::x86::read_cr3();
     println!("cr3 = {cr3:#p}");
 
-    let t = Some(unsafe { &*cr3});
+    let t = Some(unsafe { &*cr3 });
     println!("{t:?}");
     let t = t.and_then(|t| t.next_level(0));
-     println!("{t:?}");
+    println!("{t:?}");
     let t = t.and_then(|t| t.next_level(0));
-     println!("{t:?}");
+    println!("{t:?}");
     let t = t.and_then(|t| t.next_level(0));
-      println!("{t:?}");
+    println!("{t:?}");
 
     let (_gdt, _idt) = init_exceptions();
     info!("Exception initialized!");
     trigger_debug_interrupt();
-    hexdump(unsafe {&*cr3});
+    hexdump(unsafe { &*cr3 });
     loop {
         hlt()
     }
