@@ -402,6 +402,7 @@ inthandler_common:
     // 
     pop rax
     pop rdx
+    pop rbx
     pop rbp 
     pop rsi
     pop rdi
@@ -409,7 +410,6 @@ inthandler_common:
     pop r9
     pop r10
     pop r11
-    pop r12
     pop r12
     pop r13
     pop r14
@@ -494,8 +494,8 @@ extern "sysv64" fn int_handler_unimplemented() {
 }
 
 //PDDRTTTT (TTTT* type , R: Reserved: D: DPL , P: present)
-pub const BIT_FLAGS_INTGATE: u8 = 0b0000_11110u8;
-pub const BIT_FLAGS_PRESENT: u8 = 0b10000_000u8;
+pub const BIT_FLAGS_INTGATE: u8 = 0b0000_1110u8;
+pub const BIT_FLAGS_PRESENT: u8 = 0b1000_0000u8;
 pub const BIT_FLAGS_DPL0: u8 = 0 << 5;
 pub const BIT_FLAGS_DPL3: u8 = 3 << 5;
 
@@ -612,7 +612,7 @@ impl Idt {
         // SAFWTY : This is safe since it loads a valid IDT that is constructed
         //in the code just above
         unsafe {
-            asm!("Lidt[rcx]",
+            asm!("Lidt [rcx]",
             in("rcx") &params);
         }
         Self { entries }

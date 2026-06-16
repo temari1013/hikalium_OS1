@@ -36,9 +36,6 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
 
     let mut vram = init_vram(efi_system_table).expect("init_vram failed");
 
-    let vw = vram.width();
-    let vh = vram.height();
-
     draw_test_pattern(&mut vram);
 
     let mut w = VramTextWriter::new(&mut vram);
