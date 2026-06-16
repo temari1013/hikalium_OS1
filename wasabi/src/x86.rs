@@ -7,7 +7,6 @@ use alloc::boxed::Box;
 use core::arch::asm;
 use core::arch::global_asm;
 use core::fmt;
-use core::fmt::write;
 use core::marker::PhantomData;
 use core::mem::offset_of;
 use core::mem::size_of;
@@ -169,9 +168,9 @@ pub unsafe fn write_cs(cs: u16) {
     // use far-jump instead.
     asm!(
         "lea rax, [rip + 2f]", // target address
-        "push cs",
+        "push cx",
         "push rax",
-        "1jmp [rsp]",
+        "ljmp [rsp]",
             "2:",
             "add rsp, 8 + 2", // cleanup the far pointer on the stack
             in("cx") cs
@@ -181,28 +180,28 @@ pub unsafe fn write_cs(cs: u16) {
 /// #Safety
 pub unsafe fn write_ss(selector: u16) {
     asm!(
-         "mov ss ax",
+         "mov ss ,ax",
     in ("ax") selector
     )
 }
 
 pub unsafe fn write_ds(ds: u16) {
     asm!(
-         "mov ds ax",
+         "mov ds, ax",
     in ("ax") ds
     )
 }
 
 pub unsafe fn write_fs(selector: u16) {
     asm!(
-         "mov fs ax",
+         "mov fs, ax",
     in ("ax") selector
     )
 }
 
 pub unsafe fn write_gs(selector: u16) {
     asm!(
-         "mov gs ax",
+         "mov gs ,ax",
     in ("ax") selector
     )
 }
@@ -313,7 +312,7 @@ impl fmt::Debug for InterruptInfo {
 macro_rules! interrupt_entrypoint {
     ($index:literal) => {
         global_asm!(concat!(
-            ".global intterupt entrypoint",
+            ".global interrupt_entrypoint",
             stringify!($index),
             "\n",
             "interrupt_entrypoint",
@@ -324,7 +323,7 @@ macro_rules! interrupt_entrypoint {
             "mov rcx,",
             stringify!($index),
             "\n",
-            "jmp ithandler_common"
+            "jmp inthandler_common"
         ));
     };
 }
@@ -332,7 +331,7 @@ macro_rules! interrupt_entrypoint {
 macro_rules! interrupt_entrypoint_with_ecode {
     ($index:literal) => {
         global_asm!(concat!(
-            ".global intterupt entrypoint",
+            ".global interrupt_entrypoint",
             stringify!($index),
             "\n",
             "interrupt_entrypoint",
@@ -342,7 +341,7 @@ macro_rules! interrupt_entrypoint_with_ecode {
             "mov rcx,",
             stringify!($index),
             "\n",
-            "jmp ithandler_common"
+            "jmp inthandler_common"
         ));
     };
 }
@@ -366,8 +365,8 @@ extern "sysv64" {
 
 global_asm!(
     r#"
-    .global intandler_common
-    inthandler_common:
+    .global inthandler_common
+inthandler_common:
     // General purpose registers (except rsp and rcx)
     push r15
     push r14
@@ -377,7 +376,7 @@ global_asm!(
     push r10
     push r9
     push r8
-    psh rdi 
+    push rdi 
     push rsi
     push rbp
     push rbx
@@ -385,12 +384,12 @@ global_asm!(
     push rax
     // FPU Staete
     sub rsp, 512 + 8
-    fxave64[rsp]
+    fxsave64[rsp]
     // 1st parameter : pointer to the saved CPU State
-    mov rdi rsp
+    mov rdi ,rsp
     // Align the stack to 16^bytes boundary
-    moc rbp rsp
-    and rsp -16
+    mov rbp ,  rsp
+    and rsp,  -16
     // 2nd parameter: Int#
     mov rsi , rcx
 
@@ -398,7 +397,7 @@ global_asm!(
 
     mov rsp,rbp
     // fxrstor64[rsp]
-    add rsp 512 + 8
+    add rsp,  512 + 8
 
     // 
     pop rax
@@ -613,7 +612,7 @@ impl Idt {
         // SAFWTY : This is safe since it loads a valid IDT that is constructed
         //in the code just above
         unsafe {
-            asm!("Lidt[rx]",
+            asm!("Lidt[rcx]",
             in("rcx") &params);
         }
         Self { entries }
@@ -671,7 +670,7 @@ impl Drop for TaskStateSegment64 {
     }
 }
 
-pub fn initexceptions() -> (GdtWrapper, Idt) {
+pub fn init_exceptions() -> (GdtWrapper, Idt) {
     let gdt = GdtWrapper::default();
     gdt.load();
     unsafe {
@@ -721,7 +720,7 @@ pub struct Gdt {
     kernel_data_segment: GdtSegmentDescriptor,
     task_state_segment: TaskStateSegment64Descriptor,
 }
-const _: () = assert!(size_of::<Gdt>() == 48);
+const _: () = assert!(size_of::<Gdt>() == 40);
 
 #[allow(dead_code)]
 pub struct GdtWrapper {
@@ -737,7 +736,7 @@ impl GdtWrapper {
         info!("loading GDT @ {:#018X}", params.base as u64);
         // SAFETY : this is safe since it is loading a valid GDT just constructed in the above
         unsafe {
-            asm!("lgdt [rc]",
+            asm!("lgdt [rcx]",
             in("rcx") &params);
         }
         info!("Loading TSS (selector = {:#X})", TSS64_SEL);
