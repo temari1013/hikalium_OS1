@@ -30,7 +30,7 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     println!("image_handle: {:#018X}", image_handle);
     println!("efi_system_table:] {:#p}", efi_system_table);
     let loaded_image_protocol = 
-        locate_loaded_image_protocol(image_hndle,  efi_system_table).expect("Failed to get LoadedImageProtocol");
+        locate_loaded_image_protocol(image_handle,  efi_system_table).expect("Failed to get LoadedImageProtocol");
         println!("image_base : {:#018X}" ,loaded_image_protocol.image_base);
         println!("image_size : {:#018X}" ,loaded_image_protocol.image_size);
     info!("info");

@@ -227,8 +227,8 @@ pub struct EfiLoadedImageProtocol {
 }
 pub fn locate_loaded_image_protocol(
     image_handle: EfiHandle,
-    efi_system_table: &efiSystemTable,
-) -> result<&EfiLoadedImageProtocol> {
+    efi_system_table: &EfiSystemTable,
+) -> Result<&EfiLoadedImageProtocol> {
         let mut graphic_output_protocol = null_mut::<EfiLoadedImageProtocol>();
         let status = (efi_system_table.boot_services.handle_protocol)(
             image_handle,

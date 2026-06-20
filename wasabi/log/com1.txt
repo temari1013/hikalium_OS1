@@ -4,9 +4,11 @@ BdsDxe: starting Boot0002 "UEFI QEMU HARDDISK QM00001 " from PciRoot(0x0)/Pci(0x
 Booting WasabiOS...
 image_handle: 0x00000000BEC4E498
 efi_system_table:] 0x00000000bf9ee018
-[INFO] src/main.rs:31 : info
-[WARN] src/main.rs:32 : warn
-[ERROR] src/main.rs:33 : error
+image_base : 0x00000000BE31F000
+image_size : 0x000000000006D000
+[INFO] src/main.rs:36 : info
+[WARN] src/main.rs:37 : warn
+[ERROR] src/main.rs:38 : error
 00000000:49424920535953544600020078000000|IBI SYSTF...x...|
 00000010:F8EB8BD50000000018D892BF00000000|................|
 00000020:000001000000000018CED8BE00000000|................|
@@ -606,24 +608,24 @@ None
 [INFO] src/x86.rs:736: loading GDT @ 0x000000013FF7FE20
 [INFO] src/x86.rs:742: Loading TSS (selector = 0x18)
 [INFO] src/x86.rs:611: Loading IDT; IdtrParameters { limit: 4096, base: 0x13ff7ee00 }
-[INFO] src/main.rs:70 : Exception initialized!
+[INFO] src/main.rs:75 : Exception initialized!
 [ERROR] src/x86.rs:435: Interrupt Info :  {
-            rip: 0x00000000BE332C25 , CS: 0x0008 ,
-            rsp: 0x00000000BFEB0A90 , SS: 0x0010 , 
-            rbp: 0x00000000BFEB0A90 ,
+            rip: 0x00000000BE333155 , CS: 0x0008 ,
+            rsp: 0x00000000BFEB07E0 , SS: 0x0010 , 
+            rbp: 0x00000000BFEB07E0 ,
 
-            rflags: 0x0000000000000006,
+            rflags: 0x0000000000000002,
             error_code:   0x0000000000000000, 
 
-             rax: 0x0000000000000000 , rcx: 0x00000000BFEB0700 , 
-              rdx: 0x00000000BE350498 , rbx: 0x00000000BE4E52C8 , 
+             rax: 0x0000000000000000 , rcx: 0x00000000BFEB0400 , 
+              rdx: 0x00000000BE350538 , rbx: 0x00000000BE4F22C8 , 
                rsi: 0x00000000BE632018 , rdi: 0x00000000BE632018 , 
                 r8: 0x0000000000000001 , r9: 0x0000000000000004 , 
-                 r10: 0x00000000BE360200 , r11: 0x0000000000000001 , 
+                 r10: 0x00000000BE3602D0 , r11: 0x0000000000000001 , 
                   r12: 0x0000000000000000 , r13: 0x0000000000000000 , 
-                   r14: 0x00000000BE4E5218 , r15: 0x0000000000000005 ,
+                   r14: 0x00000000BE4F2218 , r15: 0x0000000000000005 ,
         }
             
 [ERROR] src/x86.rs:436: Exception 0x03:
 [ERROR] src/x86.rs:439: Breakpoint
-[ERROR] src/main.rs:80 : PANIC: PanicInfo { payload: Any { .. }, message: Some(fatal exception), location: Location { file: "src/x86.rs", line: 488, col: 5 }, can_unwind: true, force_no_backtrace: false }
+[ERROR] src/main.rs:85 : PANIC: PanicInfo { payload: Any { .. }, message: Some(fatal exception), location: Location { file: "src/x86.rs", line: 488, col: 5 }, can_unwind: true, force_no_backtrace: false }
