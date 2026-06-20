@@ -4,6 +4,8 @@
 .AppleDouble
 .LSOverride
 
+/wasabi/target/
+
 # macOS folder attributes
 Icon?
 ._*
