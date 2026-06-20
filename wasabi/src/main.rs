@@ -7,7 +7,6 @@ use core::panic::PanicInfo;
 use core::writeln;
 use wasabi::error;
 use wasabi::graphics::draw_test_pattern;
-use wasabi::graphics::Bitmap;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
 use wasabi::print::hexdump;
