@@ -9,6 +9,7 @@ use wasabi::error;
 use wasabi::graphics::draw_test_pattern;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
+use wasabi::init::init_paging;
 use wasabi::print::hexdump;
 use wasabi::println;
 use wasabi::qemu::exit_qemu;
@@ -74,6 +75,9 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let (_gdt, _idt) = init_exceptions();
     info!("Exception initialized!");
     trigger_debug_interrupt();
+    info!("execution continued");
+    init_paging(&memory_map);
+    info!("Now we are using our own page tables!");
     hexdump(unsafe { &*cr3 });
     loop {
         hlt()
