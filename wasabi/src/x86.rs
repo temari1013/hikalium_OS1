@@ -894,4 +894,8 @@ pub unsafe fn write_cr3(table: *const PML4){
 )
 }
 
-
+pub fn flush_tlb() {
+    unsafe{
+        write_cr3(read_cr3());
+    }
+}
