@@ -2,11 +2,14 @@
 #![no_main]
 #![feature(offset_of)]
 
+use core::f32::consts::E;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
 use wasabi::error;
-use wasabi::executer::block_on;
+use wasabi::executer::Executer;
+use wasabi::executer::Task;
+use wasabi::executer::yield_execution;
 use wasabi::graphics::draw_test_pattern;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
@@ -88,16 +91,24 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
         (*page_table).create_mapping(0,4096,0,PageAttr::NotPresent).expect("Failed to unmap page 0");
     }
     flush_tlb();
-
-let result = block_on(async{
-    info!("Hello from the async world!");
-    Ok(())
-});
-info!("block_on completed! result = {result:?}");
-
-    loop {
-        hlt()
-    }
+    let task1 = Task::new(async {
+        for i in 100..=103{
+            info!("{i}");
+            yield_execution().await;
+        }
+        Ok(())
+    });
+    let task2 = Task::new(async {
+        for i in 200..= 203{
+            info!("{i}");
+            yield_execution().await;
+        }
+        Ok(())
+    });
+let mut executer = Executer::new();
+executer.enqueue(task1);
+executer.enqueue(task2);
+Executer::run(executer)
 }
 
 #[panic_handler]
