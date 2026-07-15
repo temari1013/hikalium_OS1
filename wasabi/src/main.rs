@@ -7,9 +7,9 @@ use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
 use wasabi::error;
+use wasabi::executer::yield_execution;
 use wasabi::executer::Executer;
 use wasabi::executer::Task;
-use wasabi::executer::yield_execution;
 use wasabi::graphics::draw_test_pattern;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
@@ -37,10 +37,10 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     println!("Booting WasabiOS...");
     println!("image_handle: {:#018X}", image_handle);
     println!("efi_system_table:] {:#p}", efi_system_table);
-    let loaded_image_protocol = 
-        locate_loaded_image_protocol(image_handle,  efi_system_table).expect("Failed to get LoadedImageProtocol");
-        println!("image_base : {:#018X}" ,loaded_image_protocol.image_base);
-        println!("image_size : {:#018X}" ,loaded_image_protocol.image_size);
+    let loaded_image_protocol = locate_loaded_image_protocol(image_handle, efi_system_table)
+        .expect("Failed to get LoadedImageProtocol");
+    println!("image_base : {:#018X}", loaded_image_protocol.image_base);
+    println!("image_size : {:#018X}", loaded_image_protocol.image_size);
     info!("info");
     warn!("warn");
     error!("error");
@@ -84,31 +84,33 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     trigger_debug_interrupt();
     info!("execution continued");
     init_paging(&memory_map);
-    info!("Now we are using our own page tables!"); 
+    info!("Now we are using our own page tables!");
 
     let page_table = read_cr3();
     unsafe {
-        (*page_table).create_mapping(0,4096,0,PageAttr::NotPresent).expect("Failed to unmap page 0");
+        (*page_table)
+            .create_mapping(0, 4096, 0, PageAttr::NotPresent)
+            .expect("Failed to unmap page 0");
     }
     flush_tlb();
     let task1 = Task::new(async {
-        for i in 100..=103{
+        for i in 100..=103 {
             info!("{i}");
             yield_execution().await;
         }
         Ok(())
     });
     let task2 = Task::new(async {
-        for i in 200..= 203{
+        for i in 200..=203 {
             info!("{i}");
             yield_execution().await;
         }
         Ok(())
     });
-let mut executer = Executer::new();
-executer.enqueue(task1);
-executer.enqueue(task2);
-Executer::run(executer)
+    let mut executer = Executer::new();
+    executer.enqueue(task1);
+    executer.enqueue(task2);
+    Executer::run(executer)
 }
 
 #[panic_handler]

@@ -13,7 +13,6 @@ use crate::x86::PML4;
 use alloc::boxed::Box;
 use core::cmp::max;
 
-
 pub fn init_basic_runtime(
     image_handle: EfiHandle,
     efi_system_table: &EfiSystemTable,
@@ -24,23 +23,24 @@ pub fn init_basic_runtime(
     memory_map
 }
 
-pub fn init_paging(memory_map: &MemoryMapHolder){
+pub fn init_paging(memory_map: &MemoryMapHolder) {
     let mut table = PML4::new();
     let mut end_of_mem = 0x1_0000_0000u64;
     for e in memory_map.iter() {
-        match e.memory_type(){
-            CONVENTIONAL_MEMORY | LOADER_CODE |LOADER_DATA => {
+        match e.memory_type() {
+            CONVENTIONAL_MEMORY | LOADER_CODE | LOADER_DATA => {
                 end_of_mem = max(
                     end_of_mem,
                     e.physical_start() + e.number_of_pages() * (PAGE_SIZE as u64),
                 )
-
             }
-            _ => () ,
+            _ => (),
         }
     }
-table.create_mapping(0,end_of_mem,0,PageAttr::ReadWriteKernel).expect("Failed to create initial page mapping");
-unsafe {
-    write_cr3(Box::into_raw(table));
-}
+    table
+        .create_mapping(0, end_of_mem, 0, PageAttr::ReadWriteKernel)
+        .expect("Failed to create initial page mapping");
+    unsafe {
+        write_cr3(Box::into_raw(table));
+    }
 }
