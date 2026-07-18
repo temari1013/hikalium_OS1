@@ -1,9 +1,10 @@
+use crate::hpet::HpetRegisters;
 use crate::result::Result;
 use core::mem::size_of;
 
 #[repr(packed)]
 #[derive(Clone, Copy,Debug)]
-struct SystemDescriptionTableheader{
+struct SystemDescriptionTableHeader{
     signature: [u8;4],
     length:u32,
     _unused:[u8;28],
@@ -20,16 +21,16 @@ impl SystemDescriptionTableHeader {
 }
 
 struct XsdtIterator<'a> {
-    table: &'a xsdt,
+    table: &'a Xsdt,
     index:usize
 }
 
 impl<'a> XsdtIterator<'a> {
-    pub fn new (table: &'a xsdt) -> self {
-        XsdtIterator {table, index:0}
+    pub fn new (table: &'a Xsdt) -> Self {
+        XsdtIterator { table, index: 0 }
     }
 }
-impl<'a> Iterator for XsdtItarator<'a> {
+impl<'a> Iterator for XsdtIterator<'a> {
     type Item = &'static SystemDescriptionTableHeader;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.table.num_of_entries(){
@@ -37,12 +38,12 @@ impl<'a> Iterator for XsdtItarator<'a> {
         }else {
             self.index += 1;
             Some(unsafe {
-                &*(self.table.entry(self.index  -1) as *const SystemDesctiptionTableHeader)
+                &*(self.table.entry(self.index  -1) as *const SystemDescriptionTableHeader)
             })
         }
     }
 }
-#[repr(packe)]
+#[repr(packed)]
 struct Xsdt {
     header: SystemDescriptionTableHeader, 
 }
@@ -52,11 +53,11 @@ impl Xsdt {
     fn find_table(
         &self , 
         sig: &'static[u8;4],
-    ) -> Option<&'static SystemDescriptrionTableHeader> {
+    ) -> Option<&'static SystemDescriptionTableHeader> {
         self.iter().find(|&e| e.signature() == sig)
     }
     fn header_size(&self) -> usize {
-        size_of::<self>()
+        size_of::<Self>()
     }
     fn num_of_entries(&self) -> usize{
         (self.header.length as usize -self.header_size())/size_of::<*const u8>()
@@ -70,19 +71,19 @@ impl Xsdt {
 }
 
 trait AcpiTable{
-    const SIGNATURE: &'static[u8;4];
+    const SIGNATURE:&'static[u8;4];
     type Table;
     fn new(header: &SystemDescriptionTableHeader) -> &Self::Table{
-        header.expect_signature(Self::SIGNATURE);
-
-            let mcfg :&Self::Table = unsafe {
-        &*(header as *const SystemDescriptionTableHeader as *const self::Table)
-            mcfg
-          };
+        header.expect_signature(Self::SIGNATURE
+        );
+        let mfcg : &Self::Table = unsafe {
+            &*(header as *const SystemDescriptionTableHeader as *const Self::Table)
+        };
+        mfcg
     }
 }
 
-#[repr(pacjed)]
+#[repr(packed)]
 pub struct GenericAddress {
     address_space_id :u8,
     _unused:[u8;3],
@@ -111,9 +112,9 @@ impl AcpiTable for AcpiHpetDescriptor {
     type Table = Self;
 }
 impl AcpiHpetDescriptor {
-    pub fn base_address(&self) -> Result<usize>{
-        pub fn base_address(&self) -> Rsult<usize> {
-            self.address.address_in_memory_space()
+    pub fn base_address(&self) -> Result<&'static mut HpetRegisters> {
+        unsafe {
+            self.address.address_in_memory_space().map(|addr| &mut *(addr as *mut HpetRegisters))
         }
     }
 }
@@ -134,8 +135,8 @@ impl AcpiRsdpStruct{
     fn xsdt(&self) -> &Xsdt{
         unsafe {&*(self.xsdt as *const Xsdt)}
     }
-    pub fn hpet(&self) -> Option<&AcpiHpetDescrir> {
+    pub fn hpet(&self) -> Option<&AcpiHpetDescriptor> {
         let xsdt = self.xsdt();
-        xsdt.find_table(b"HPET").map(AcpiHpetDesctiprot::new)
+        xsdt.find_table(b"HPET").map(AcpiHpetDescriptor::new)
     }
 }

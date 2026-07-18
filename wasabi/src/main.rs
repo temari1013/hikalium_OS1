@@ -6,11 +6,16 @@ use core::f32::consts::E;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
+use core::time::Duration;
 use wasabi::error;
 use wasabi::executer::yield_execution;
 use wasabi::executer::Executer;
 use wasabi::executer::Task;
+use wasabi::executer::TimeoutFuture;
 use wasabi::graphics::draw_test_pattern;
+use wasabi::hpet::global_timestamp;
+use wasabi::hpet::set_global_hpet;
+use wasabi::hpet::Hpet;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
 use wasabi::init::init_paging;
@@ -51,6 +56,7 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     draw_test_pattern(&mut vram);
 
     let mut w = VramTextWriter::new(&mut vram);
+    let acpi = efi_system_table.acpi_table().expect("ACPI table not found");
     let memory_map = init_basic_runtime(image_handle, efi_system_table);
     let mut total_memory_pages = 0;
     for e in memory_map.iter() {
@@ -93,17 +99,25 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
             .expect("Failed to unmap page 0");
     }
     flush_tlb();
-    let task1 = Task::new(async {
+    let hpet = acpi.hpet().expect("Failed to get HPET from API");
+    let hpet = hpet.base_address().expect("Failed to get HPET bas address");
+        info!("HPET is at {hpet:#p}");
+    let hpet = Hpet::new(hpet);
+
+    set_global_hpet(hpet);
+    let t0 = global_timestamp();
+
+    let task1 = Task::new(async  move {
         for i in 100..=103 {
-            info!("{i}");
-            yield_execution().await;
+            info!("{i} hpet.main_counter = {:?}" , global_timestamp() -t0);
+            TimeoutFuture::new(Duration::from_secs(1)).await;
         }
         Ok(())
     });
-    let task2 = Task::new(async {
+    let task2 = Task::new(async move {
         for i in 200..=203 {
-            info!("{i}");
-            yield_execution().await;
+            info!("{i} hpet.main_counter = {:?}" , global_timestamp() -t0);
+            TimeoutFuture::new(Duration::from_secs(1)).await;
         }
         Ok(())
     });
