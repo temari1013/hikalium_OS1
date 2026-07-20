@@ -4,11 +4,11 @@ BdsDxe: starting Boot0002 "UEFI QEMU HARDDISK QM00001 " from PciRoot(0x0)/Pci(0x
 Booting WasabiOS...
 image_handle: 0x00000000BEC4E498
 efi_system_table:] 0x00000000bf9ee018
-image_base : 0x00000000BE31A000
-image_size : 0x000000000007C000
-[INFO] src/main.rs:46 : info
-[WARN] src/main.rs:47 : warn
-[ERROR] src/main.rs:48 : error
+image_base : 0x00000000BE319000
+image_size : 0x000000000007D000
+[INFO] src/main.rs:48 : info
+[WARN] src/main.rs:49 : warn
+[ERROR] src/main.rs:50 : error
 00000000:49424920535953544600020078000000|IBI SYSTF...x...|
 00000010:F8EB8BD50000000018D892BF00000000|................|
 00000020:000001000000000018CED8BE00000000|................|
@@ -22,27 +22,44 @@ image_size : 0x000000000007C000
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 8421376, virtual_start: 0, number_of_pages: 3, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 8437760, virtual_start: 0, number_of_pages: 4, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 22020096, virtual_start: 0, number_of_pages: 764470, attribute: 15 }
-[INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3153420288, virtual_start: 0, number_of_pages: 9156, attribute: 15 }
-[INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3191431168, virtual_start: 0, number_of_pages: 120, attribute: 15 }
-[INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3192901632, virtual_start: 0, number_of_pages: 1, attribute: 15 }
+[INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3153420288, virtual_start: 0, number_of_pages: 9155, attribute: 15 }
+[INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3191431168, virtual_start: 0, number_of_pages: 121, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3194228736, virtual_start: 0, number_of_pages: 2, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3194261504, virtual_start: 0, number_of_pages: 2, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 3219128320, virtual_start: 0, number_of_pages: 154, attribute: 15 }
 [INFO] src/init.rs:73 : EfiMemoryDescriptor { memory_type: CONVENTIONAL_MEMORY, physical_start: 4294967296, virtual_start: 0, number_of_pages: 262144, attribute: 15 }
-[INFO] src/init.rs:76 : Total: 1038007 pages = 4054 MIB
+[INFO] src/init.rs:76 : Total: 1038006 pages = 4054 MIB
 [INFO] src/x86.rs:737: TSS64 created @ 0x13FF7FE80
 [INFO] src/x86.rs:810: loading GDT @ 0x000000013FF7FE20
 [INFO] src/x86.rs:816: Loading TSS (selector = 0x18)
 [INFO] src/x86.rs:685: Loading IDT; IdtrParameters { limit: 4096, base: 0x13ff7ee00 }
 [INFO] src/init.rs:61 : HPET is at 0x00000000fed00000
 [INFO] src/executer.rs:93 : Executer starts running...
-[INFO] src/main.rs:69 : 100 hpet.main_counter = 5.5754ms
-[INFO] src/main.rs:76 : 200 hpet.main_counter = 11.45783ms
-[INFO] src/main.rs:69 : 101 hpet.main_counter = 1.01082319s
-[INFO] src/main.rs:76 : 201 hpet.main_counter = 1.01564166s
-[INFO] src/main.rs:69 : 102 hpet.main_counter = 2.01325789s
-[INFO] src/main.rs:76 : 202 hpet.main_counter = 2.01801413s
-[INFO] src/main.rs:69 : 103 hpet.main_counter = 3.01584011s
-[INFO] src/main.rs:76 : 203 hpet.main_counter = 3.02078675s
-[INFO] src/executer.rs:101: Task completed : Task(src/main.rs:67) ,  :Ok(())
-[INFO] src/executer.rs:101: Task completed : Task(src/main.rs:74) ,  :Ok(())
+[INFO] src/main.rs:72 : 100 hpet.main_counter = 6.4503ms
+[INFO] src/main.rs:79 : 200 hpet.main_counter = 11.31865ms
+[INFO] src/main.rs:92 : Started to monitor serial port
+[INFO] src/main.rs:72 : 101 hpet.main_counter = 1.01094261s
+[INFO] src/main.rs:79 : 201 hpet.main_counter = 1.01367163s
+[INFO] src/main.rs:72 : 102 hpet.main_counter = 2.01361847s
+[INFO] src/main.rs:79 : 202 hpet.main_counter = 2.0157962s
+[INFO] src/main.rs:72 : 103 hpet.main_counter = 3.01579764s
+[INFO] src/main.rs:79 : 203 hpet.main_counter = 3.01788115s
+[INFO] src/executer.rs:101: Task completed : Task(src/main.rs:70) ,  :Ok(())
+[INFO] src/executer.rs:101: Task completed : Task(src/main.rs:77) ,  :Ok(())
+[INFO] src/main.rs:96 : serial input: 0x61 = Some('a')
+[INFO] src/main.rs:96 : serial input: 0x73 = Some('s')
+[INFO] src/main.rs:96 : serial input: 0x64 = Some('d')
+[INFO] src/main.rs:96 : serial input: 0x66 = Some('f')
+[INFO] src/main.rs:96 : serial input: 0x64 = Some('d')
+[INFO] src/main.rs:96 : serial input: 0x61 = Some('a')
+[INFO] src/main.rs:96 : serial input: 0x73 = Some('s')
+[INFO] src/main.rs:96 : serial input: 0x64 = Some('d')
+[INFO] src/main.rs:96 : serial input: 0x66 = Some('f')
+[INFO] src/main.rs:96 : serial input: 0x68 = Some('h')
+[INFO] src/main.rs:96 : serial input: 0x6F = Some('o')
+[INFO] src/main.rs:96 : serial input: 0x67 = Some('g')
+[INFO] src/main.rs:96 : serial input: 0x65 = Some('e')
+[INFO] src/main.rs:96 : serial input: 0x68 = Some('h')
+[INFO] src/main.rs:96 : serial input: 0x67 = Some('g')
+[INFO] src/main.rs:96 : serial input: 0x6F = Some('o')
+[INFO] src/main.rs:96 : serial input: 0x65 = Some('e')
