@@ -20,6 +20,7 @@ use wasabi::init::init_basic_runtime;
 use wasabi::init::init_display;
 use wasabi::init::init_hpet;
 use wasabi::init::init_paging;
+use wasabi::init::init_pci;
 use wasabi::print::hexdump;
 use wasabi::print::set_global_vram;
 use wasabi::println;
@@ -64,6 +65,8 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     init_paging(&memory_map);
 
     init_hpet(acpi);
+    info!("init_pci");
+    init_pci(acpi);
     
     let t0 = global_timestamp();
 

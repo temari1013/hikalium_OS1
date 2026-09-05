@@ -1,6 +1,6 @@
 use crate::hpet::HpetRegisters;
 use crate::result::Result;
-use core::fmt::{self, write};
+use core::fmt;
 use core::mem::size_of;
 
 #[repr(packed)]
@@ -149,22 +149,22 @@ impl AcpiRsdpStruct{
 #[repr(C)]
 #[derive(Debug)]
 #[allow(dead_code)]
-pub struct AcpiMcfgdescriptor{
+pub struct AcpiMcfgDescriptor{
     header : SystemDescriptionTableHeader,
     _unused: [u8;8],
 }
-impl AcpiTable for AcpiMcfgdescriptor {
+impl AcpiTable for AcpiMcfgDescriptor {
     const SIGNATURE:&'static[u8;4] = b"MCFG";
     type Table = Self;
 }
-const _: () = assert!(size_of::<AcpiHpetDescriptor>() == 44);
+const _: () = assert!(size_of::<AcpiMcfgDescriptor>() == 44);
 
-impl AcpiMcfgdescriptor{
+impl AcpiMcfgDescriptor{
     pub fn header_size(&self) -> usize{
         size_of::<Self>()
     }
     pub fn num_of_entries(&self) -> usize{ 
-        (self.header.length as usize - self.header_size()) / size_of<EcamEntry>()
+        (self.header.length as usize - self.header_size()) / size_of::<EcamEntry>()
 
     }
     pub fn entry(&self , index:usize) -> Option<&EcamEntry>{
@@ -192,12 +192,14 @@ impl EcamEntry{
     }
 }
 impl fmt::Display for EcamEntry {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let base = self.ecm_base_addr;
-        let bus_start = self.start_pci_bus;
-        let bus_end = self.end_pci_bus;
-        write!8
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+      let base = self.ecm_base_addr;
+      let bus_start = self.start_pci_bus;
+      let bus_end = self.end_pci_bus;
+      write!(
         f ,
-        "ECAM: Bus[{} ..= {}]"
-    }
+        "ECAM: Bus [{} ..= {}] is mappped at {:#X}",
+        bus_start, bus_end , base
+      )
+  }
 }
